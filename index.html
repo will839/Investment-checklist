@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>Ackman + Pabrai Investment Checklist</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0d9488 0%, #14b8a6 0%);
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+    color: white;
+    padding: 20px 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+  }
+  .header p {
+    opacity: 0.9;
+    font-size: 0.85em;
+  }
+  .progress-section {
+    background: #f0fdfa;
+    padding: 15px 20px;
+    border-bottom: 2px solid #14b8a6;
+    flex-shrink: 0;
+  }
+  .progress-bar-container {
+    background: #ccfbf1;
+    border-radius: 20px;
+    height: 22px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .progress-bar {
+    background: linear-gradient(90deg, #0d9488 0%, #14b8a6 100%);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.75em;
+  }
+  .progress-text {
+    text-align: center;
+    color: #0f766e;
+    font-weight: 600;
+    font-size: 0.9em;
+  }
+  .scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .section-header {
+    background: #e0f2f1;
+    padding: 10px 20px;
+    margin-top: 12px;
+    border-left: 4px solid #14b8a6;
+  }
+  .section-header:first-child {
+    margin-top: 0;
+  }
+  .section-title {
+    font-size: 1em;
+    font-weight: 700;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section-subtitle {
+    font-size: 0.75em;
+    color: #14b8a6;
+    margin-top: 3px;
+  }
+  .checklist {
+    padding: 12px 20px 20px;
+  }
+  .checklist-item {
+    background: #ffffff;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+  .checklist-item:hover {
+    border-color: #14b8a6;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
+  }
+  .item-title {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #0f766e;
+    margin-bottom: 5px;
+  }
+  .item-description {
+    color: #6b7280;
+    line-height: 1.4;
+    font-size: 0.85em;
+  }
+  .actions {
+    padding: 12px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 130px;
+  }
+  .btn-reset {
+    background: #ef4444;
+    color: white;
+  }
+  .btn-reset:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+  .btn-print {
+    background: #14b8a6;
+    color: white;
+  }
+  .btn-print:hover {
+    background: #0d9488;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+  }
+
+  /* Custom checkboxes styled to match header font size and color */
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.5em;
+    height: 1.5em;
+    min-width: 1.5em;
+    min-height: 1.5em;
+    border: 2px solid #0f766e;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    margin-top: 2px;
+  }
+  input[type="checkbox"]:checked {
+    background-color: #0f766e;
+  }
+  input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1em;
+    color: white;
+    font-weight: bold;
+  }
+
+  /* Custom scrollbar */
+  .scrollable-content::-webkit-scrollbar {
+    width: 10px;
+  }
+  .scrollable-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+  .scrollable-content::-webkit-scrollbar-thumb {
+    background: #14b8a6;
+    border-radius: 5px;
+  }
+  .scrollable-content::-webkit-scrollbar-thumb:hover {
+    background: #0d9488;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    .header h1 {
+      font-size: 1.3em;
+    }
+    .header p {
+      font-size: 0.8em;
+    }
+  }
+
+  /* Extra small phones */
+  @media (max-width: 480px) {
+    .header {
+      padding: 15px 15px;
+    }
+    .header h1 {
+      font-size: 1.1em;
+    }
+    .header p {
+      font-size: 0.75em;
+    }
+    .progress-section {
+      padding: 12px 15px;
+    }
+    .section-header {
+      padding: 8px 15px;
+    }
+    .section-title {
+      font-size: 0.9em;
+    }
+    .section-subtitle {
+      font-size: 0.7em;
+    }
+    .checklist {
+      padding: 10px 15px 15px;
+    }
+    .checklist-item {
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+    .item-title {
+      font-size: 0.85em;
+    }
+    .item-description {
+      font-size: 0.8em;
+    }
+    input[type="checkbox"] {
+      width: 1.3em;
+      height: 1.3em;
+      min-width: 1.3em;
+      min-height: 1.3em;
+    }
+    input[type="checkbox"]:checked::after {
+      font-size: 0.9em;
+    }
+    .actions {
+      padding: 10px 15px;
+    }
+    .btn {
+      font-size: 0.8em;
+      padding: 9px 14px;
+    }
+  }
+
+  @media print {
+    body {
+      background: white;
+      padding: 0;
+      overflow: visible;
+    }
+    .container {
+      box-shadow: none;
+      max-height: none;
+      min-height: auto;
+    }
+    .scrollable-content {
+      overflow: visible;
+    }
+    .actions {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📊 Master Investment Checklist</h1>
+    <p>Bill Ackman's Quality Framework + Mohnish Pabrai's Dhando Principles</p>
+  </div>
+  <div class="progress-section">
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar">0%</div>
+    </div>
+    <div class="progress-text" id="progressText">0 of 18 criteria met</div>
+  </div>
+  <div class="scrollable-content" id="checklistContainer"></div>
+  <div class="actions">
+    <button class="btn btn-reset" onclick="resetChecklist()">🔄 Reset All</button>
+    <button class="btn btn-print" onclick="window.print()">🖨️ Print Checklist</button>
+  </div>
+</div>
+<script>
+const checklistSections = [
+  {
+    title: "📈 Bill Ackman's Quality Investment Framework",
+    subtitle: "Principles for evaluating exceptional businesses",
+    items: [
+      {
+        title: "The business is not a startup. The business must have a record of success.",
+        description: "You don't need to make 100% per year to make a fortune. You just need around 15% PA over time."
+      },
+      {
+        title: "Is the business a publicly listed company?",
+        description: "The business is liquid so can be sold easily."
+      },
+      {
+        title: "I understand how the company makes money.",
+        description: "How the business makes money should be easy to understand. Like Coke, Apple etc."
+      },
+      {
+        title: "The company could last forever.",
+        description: "The stock market could close tomorrow for 10 years and your investment would be fine."
+      },
+      {
+        title: "The business has a strong balance sheet.",
+        description: "Low debt relative to earnings. The company has little to no debt. And it doesn't require external capital to survive."
+      },
+      {
+        title: "The company has scope to grow over time.",
+        description: "Has market scope to grow and expand."
+      },
+      {
+        title: "The business has a high barrier of entry.",
+        description: "The business can not be copied or replicated by others easily."
+      },
+      {
+        title: "The business is immune to extrinsic factors.",
+        description: "The business will not be affected by fluctuations in the global economy."
+      },
+      {
+        title: "The business does not require a lot of reinvested capital to survive.",
+        description: "The business should be healthy enough to generate revenue that is seen as cash on hand or distributed as dividends to shareholders."
+      },
+      {
+        title: "The business does not have a controlling shareholder.",
+        description: "The business should not be majority controlled by a single shareholder as the minority shareholders can be overlooked and the controlling shareholder can change at any time."
+      },
+      {
+        title: "The demand for the product will last.",
+        description: "Is it a product that people need? Is the product unique? Is it a brand that customers are willing to pay for."
+      }
+    ]
+  },
+  {
+    title: "🎯 Mohnish Pabrai's Dhando Investment Principles",
+    subtitle: "Additional criteria for 'Heads I win, tails I don't lose much' investing",
+    items: [
+      {
+        title: "The business has an ultra-slow rate of industry change.",
+        description: "Invest in simple businesses operating in industries with very slow rates of change. These are often unloved by the market but provide predictability and stability."
+      },
+      {
+        title: "It is a distressed business opportunity.",
+        description: "Look for quality businesses in distressed situations or distressed industries where you can buy assets at steep discounts to underlying value. The near-term may be murky, but long-term prospects are solid."
+      },
+      {
+        title: "Protected by low-cost structure.",
+        description: "The business cannot be decimated by low-cost foreign competition or labor arbitrage. Check if competitive advantages protect against this threat (learned from Berkshire's Dexter Shoes mistake)."
+      },
+      {
+        title: "Limited Union or labor risk.",
+        description: "Business is not heavily unionized or vulnerable to being harmed by union actions. If unionized, is it a low-cost operator that can withstand pressure? (Learned from Berkshire's US Air investment.)"
+      },
+      {
+        title: "Margin of safety in valuation.",
+        description: "Trading at a significant discount (30%+) to intrinsic value. This provides downside protection and asymmetric upside—the essence of 'heads I win, tails I don't lose much.'"
+      },
+      {
+        title: "Low Risk, High Uncertainty.",
+        description: "Look for situations where uncertainty (not risk) is high, leading to depressed prices. The downside is limited, but the market hasn't recognized the true low-risk nature of the investment."
+      }
+    ]
+  },
+  {
+    title: "⚖️ Portfolio Risk Management",
+    subtitle: "Position sizing and diversification discipline",
+    items: [
+      {
+        title: "Position Size Within Risk Limits.",
+        description: "This investment will not exceed 5% of your total portfolio at cost. Proper position sizing ensures that even if you're wrong, no single investment can significantly damage your overall wealth. Disciplined position sizing is essential for long-term wealth preservation."
+      }
+    ]
+  }
+];
+
+let checkedItems = {};
+
+function initChecklist() {
+  loadProgress();
+  renderChecklist();
+  updateProgress();
+}
+
+function renderChecklist() {
+  const container = document.getElementById('checklistContainer');
+  container.innerHTML = '';
+
+  let globalIndex = 0;
+
+  checklistSections.forEach((section) => {
+    // Section header
+    const sectionHeader = document.createElement('div');
+    sectionHeader.className = 'section-header';
+    sectionHeader.innerHTML = `
+      <div class="section-title">${section.title}</div>
+      <div class="section-subtitle">${section.subtitle}</div>
+    `;
+    container.appendChild(sectionHeader);
+
+    // Checklist items
+    const checklist = document.createElement('div');
+    checklist.className = 'checklist';
+
+    section.items.forEach((item) => {
+      const isChecked = checkedItems[globalIndex] || false;
+
+      const itemDiv = document.createElement('div');
+      itemDiv.className = `checklist-item ${isChecked ? 'checked' : ''}`;
+
+      // Use label with native checkbox styled to match header font size and color
+      itemDiv.innerHTML = `
+        <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleItem(${globalIndex})">
+          <div>
+            <div class="item-title">${item.title}</div>
+            <div class="item-description">${item.description}</div>
+          </div>
+        </label>
+      `;
+
+      checklist.appendChild(itemDiv);
+      globalIndex++;
+    });
+
+    container.appendChild(checklist);
+  });
+}
+
+function getTotalItems() {
+  return checklistSections.reduce((total, section) => total + section.items.length, 0);
+}
+
+function toggleItem(index) {
+  checkedItems[index] = !checkedItems[index];
+  saveProgress();
+  renderChecklist();
+  updateProgress();
+}
+
+function updateProgress() {
+  const total = getTotalItems();
+  const checkedCount = Object.values(checkedItems).filter(Boolean).length;
+  const percentage = Math.round((checkedCount / total) * 100);
+  const progressBar = document.getElementById('progressBar');
+  const progressText = document.getElementById('progressText');
+
+  progressBar.style.width = percentage + '%';
+  progressBar.textContent = percentage + '%';
+  progressText.textContent = `${checkedCount} of ${total} criteria met`;
+}
+
+function saveProgress() {
+  localStorage.setItem('masterInvestmentChecklist', JSON.stringify(checkedItems));
+}
+
+function loadProgress() {
+  const saved = localStorage.getItem('masterInvestmentChecklist');
+  if (saved) {
+    checkedItems = JSON.parse(saved);
+  }
+}
+
+function resetChecklist() {
+  if (confirm('Are you sure you want to reset all checkboxes?')) {
+    checkedItems = {};
+    saveProgress();
+    renderChecklist();
+    updateProgress();
+  }
+}
+
+initChecklist();
+</script>
+</body>
+</html>
