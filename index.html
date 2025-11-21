@@ -170,6 +170,30 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
   }
+  
+  .footer {
+    background: #f0fdfa;
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid #14b8a6;
+    flex-shrink: 0;
+  }
+  
+  .footer p {
+    color: #0f766e;
+    font-size: 0.9em;
+    margin: 0;
+  }
+  
+  .footer a {
+    color: #14b8a6;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  .footer a:hover {
+    text-decoration: underline;
+  }
 
   /* Custom checkboxes styled to match header font size and color */
   input[type="checkbox"] {
@@ -293,7 +317,7 @@
     .scrollable-content {
       overflow: visible;
     }
-    .actions {
+    .actions, .footer {
       display: none;
     }
   }
@@ -315,6 +339,10 @@
   <div class="actions">
     <button class="btn btn-reset" onclick="resetChecklist()">🔄 Reset All</button>
     <button class="btn btn-print" onclick="window.print()">🖨️ Print Checklist</button>
+  </div>
+  
+  <div class="footer">
+    <p>📧 Feedback? Email: <a href="mailto:will@willfaulkner.com">will@willfaulkner.com</a></p>
   </div>
 </div>
 <script>
