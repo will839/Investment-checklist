@@ -24,11 +24,14 @@
   }
   .container {
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
     height: 100%;
     background: white;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
   }
   .header {
     background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
@@ -241,6 +244,10 @@
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
+    .container {
+      max-width: 100%;
+      box-shadow: none;
+    }
     .header h1 {
       font-size: 1.3em;
     }
