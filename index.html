@@ -98,6 +98,23 @@
   .stock-field input::placeholder {
     color: #9ca3af;
   }
+  
+  .stock-field input:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+  }
+  
+  .loading {
+    color: #14b8a6;
+    font-size: 0.85em;
+    margin-top: 2px;
+  }
+  
+  .error {
+    color: #ef4444;
+    font-size: 0.85em;
+    margin-top: 2px;
+  }
   .progress-bar-container {
     background: #ccfbf1;
     border-radius: 20px;
@@ -405,11 +422,12 @@
     <div class="stock-info-grid">
       <div class="stock-field">
         <label for="stockTicker">Stock Ticker</label>
-        <input type="text" id="stockTicker" placeholder="e.g., AAPL" oninput="saveStockInfo()">
+        <input type="text" id="stockTicker" placeholder="e.g., AAPL" oninput="handleTickerInput()" style="text-transform: uppercase;">
+        <div id="tickerStatus"></div>
       </div>
       <div class="stock-field">
         <label for="companyName">Company Name</label>
-        <input type="text" id="companyName" placeholder="e.g., Apple Inc." oninput="saveStockInfo()">
+        <input type="text" id="companyName" placeholder="Auto-filled" disabled>
       </div>
       <div class="stock-field">
         <label for="analysisDate">Date</label>
@@ -417,7 +435,7 @@
       </div>
       <div class="stock-field">
         <label for="stockPrice">Current Price</label>
-        <input type="text" id="stockPrice" placeholder="e.g., $225.50" oninput="saveStockInfo()">
+        <input type="text" id="stockPrice" placeholder="Auto-filled" disabled>
       </div>
     </div>
   </div>
@@ -528,6 +546,7 @@ const checklistSections = [
 
 let checkedItems = {};
 let stockInfo = {};
+let tickerTimeout;
 
 function initChecklist() {
   loadProgress();
@@ -548,6 +567,68 @@ function loadStockInfo() {
     // Set today's date as default
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('analysisDate').value = today;
+  }
+}
+
+function handleTickerInput() {
+  clearTimeout(tickerTimeout);
+  const ticker = document.getElementById('stockTicker').value.trim().toUpperCase();
+  
+  if (ticker.length === 0) {
+    document.getElementById('companyName').value = '';
+    document.getElementById('stockPrice').value = '';
+    document.getElementById('tickerStatus').innerHTML = '';
+    saveStockInfo();
+    return;
+  }
+  
+  // Wait for user to stop typing
+  tickerTimeout = setTimeout(() => {
+    fetchStockData(ticker);
+  }, 800);
+}
+
+async function fetchStockData(ticker) {
+  const statusDiv = document.getElementById('tickerStatus');
+  statusDiv.innerHTML = '<span class="loading">Loading...</span>';
+  
+  try {
+    // Using Yahoo Finance API via a proxy
+    const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`);
+    const data = await response.json();
+    
+    if (data.chart.result && data.chart.result.length > 0) {
+      const result = data.chart.result[0];
+      const companyName = result.meta.longName || result.meta.shortName || ticker;
+      const price = result.meta.regularMarketPrice;
+      const currency = result.meta.currency || 'USD';
+      
+      // Update fields
+      document.getElementById('companyName').value = companyName;
+      document.getElementById('stockPrice').value = `${price.toFixed(2)} ${currency}`;
+      
+      // Set today's date
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('analysisDate').value = today;
+      
+      statusDiv.innerHTML = '<span class="loading">✓ Found</span>';
+      setTimeout(() => {
+        statusDiv.innerHTML = '';
+      }, 2000);
+      
+      saveStockInfo();
+    } else {
+      throw new Error('Stock not found');
+    }
+  } catch (error) {
+    console.error('Error fetching stock data:', error);
+    statusDiv.innerHTML = '<span class="error">Ticker not found. Please check the symbol.</span>';
+    document.getElementById('companyName').value = '';
+    document.getElementById('stockPrice').value = '';
+    
+    setTimeout(() => {
+      statusDiv.innerHTML = '';
+    }, 3000);
   }
 }
 
