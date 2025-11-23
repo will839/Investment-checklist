@@ -54,6 +54,50 @@
     border-bottom: 2px solid #14b8a6;
     flex-shrink: 0;
   }
+  
+  .stock-info {
+    background: #ffffff;
+    padding: 20px 20px;
+    border-bottom: 2px solid #e5e7eb;
+    flex-shrink: 0;
+  }
+  
+  .stock-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .stock-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .stock-field label {
+    font-size: 0.85em;
+    font-weight: 600;
+    color: #0f766e;
+  }
+  
+  .stock-field input {
+    padding: 10px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95em;
+    transition: border-color 0.2s;
+  }
+  
+  .stock-field input:focus {
+    outline: none;
+    border-color: #14b8a6;
+  }
+  
+  .stock-field input::placeholder {
+    color: #9ca3af;
+  }
   .progress-bar-container {
     background: #ccfbf1;
     border-radius: 20px;
@@ -270,6 +314,20 @@
     .progress-section {
       padding: 12px 15px;
     }
+    .stock-info {
+      padding: 15px 15px;
+    }
+    .stock-info-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .stock-field label {
+      font-size: 0.8em;
+    }
+    .stock-field input {
+      padding: 8px;
+      font-size: 0.9em;
+    }
     .section-header {
       padding: 8px 15px;
     }
@@ -333,7 +391,7 @@
 <body>
 <div class="container">
   <div class="header">
-    <h1>📊 Quality Investment Checklist</h1>
+    <h1>📊 Master Investment Checklist</h1>
     <p>Bill Ackman's Quality Framework + Mohnish Pabrai's Dhando Principles</p>
   </div>
   <div class="progress-section">
@@ -342,6 +400,28 @@
     </div>
     <div class="progress-text" id="progressText">0 of 18 criteria met</div>
   </div>
+  
+  <div class="stock-info">
+    <div class="stock-info-grid">
+      <div class="stock-field">
+        <label for="stockTicker">Stock Ticker</label>
+        <input type="text" id="stockTicker" placeholder="e.g., AAPL" oninput="saveStockInfo()">
+      </div>
+      <div class="stock-field">
+        <label for="companyName">Company Name</label>
+        <input type="text" id="companyName" placeholder="e.g., Apple Inc." oninput="saveStockInfo()">
+      </div>
+      <div class="stock-field">
+        <label for="analysisDate">Date</label>
+        <input type="date" id="analysisDate" oninput="saveStockInfo()">
+      </div>
+      <div class="stock-field">
+        <label for="stockPrice">Current Price</label>
+        <input type="text" id="stockPrice" placeholder="e.g., $225.50" oninput="saveStockInfo()">
+      </div>
+    </div>
+  </div>
+  
   <div class="scrollable-content" id="checklistContainer"></div>
   <div class="actions">
     <button class="btn btn-reset" onclick="resetChecklist()">🔄 Reset All</button>
@@ -447,11 +527,38 @@ const checklistSections = [
 ];
 
 let checkedItems = {};
+let stockInfo = {};
 
 function initChecklist() {
   loadProgress();
+  loadStockInfo();
   renderChecklist();
   updateProgress();
+}
+
+function loadStockInfo() {
+  const saved = localStorage.getItem('stockInfo');
+  if (saved) {
+    stockInfo = JSON.parse(saved);
+    document.getElementById('stockTicker').value = stockInfo.ticker || '';
+    document.getElementById('companyName').value = stockInfo.company || '';
+    document.getElementById('analysisDate').value = stockInfo.date || '';
+    document.getElementById('stockPrice').value = stockInfo.price || '';
+  } else {
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('analysisDate').value = today;
+  }
+}
+
+function saveStockInfo() {
+  stockInfo = {
+    ticker: document.getElementById('stockTicker').value,
+    company: document.getElementById('companyName').value,
+    date: document.getElementById('analysisDate').value,
+    price: document.getElementById('stockPrice').value
+  };
+  localStorage.setItem('stockInfo', JSON.stringify(stockInfo));
 }
 
 function renderChecklist() {
@@ -534,9 +641,15 @@ function loadProgress() {
 }
 
 function resetChecklist() {
-  if (confirm('Are you sure you want to reset all checkboxes?')) {
+  if (confirm('Are you sure you want to reset all checkboxes and stock information?')) {
     checkedItems = {};
+    stockInfo = {};
     saveProgress();
+    localStorage.removeItem('stockInfo');
+    document.getElementById('stockTicker').value = '';
+    document.getElementById('companyName').value = '';
+    document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
+    document.getElementById('stockPrice').value = '';
     renderChecklist();
     updateProgress();
   }
